@@ -20,7 +20,7 @@
 
 <div class="container-fluid">
     <h2 class="text-center mb-1">JABATAN KEJURUTERAAN GEOMATIK</h2>
-    <h4 class="text-center text-muted mb-4">Sistem E-Cerapan Azimut (2 Set Data)</h4>
+    <h4 class="text-center text-muted mb-4">Sistem E-Cerapan Azimut (Lampiran K1 - 4 Bacaan)</h4>
 
     <div class="row">
         <div class="col-xl-6">
@@ -29,19 +29,27 @@
                 <div class="table-responsive">
                     <table class="table table-bordered mb-0 table-input">
                         <tr class="table-header">
-                            <td>Waktu</td><td>P.Ki/Ka</td><td>Mengufuk (ddd.mmss)</td><td>Pugak (ddd.mmss)</td>
+                            <td>Waktu</td><td>P.Ki/Ka</td><td>Mengufuk (Hz)</td><td>Pugak (V)</td>
                         </tr>
                         <tr>
-                            <td><input type="text" id="w1_s1" placeholder="9.00"></td>
-                            <td>P.Ki</td>
-                            <td><input type="number" step="any" id="hKiri_s1" placeholder="Hz1"></td>
-                            <td><input type="number" step="any" id="vKiri_s1" placeholder="V1"></td>
+                            <td><input type="text" id="t1_s1" placeholder="t1"></td><td>P.Ki</td>
+                            <td><input type="number" step="any" id="h1_s1" placeholder="Hz1"></td>
+                            <td><input type="number" step="any" id="v1_s1" placeholder="V1"></td>
                         </tr>
                         <tr>
-                            <td><input type="text" id="w3_s1" placeholder="9.02"></td>
-                            <td>P.Ka</td>
-                            <td><input type="number" step="any" id="hKanan_s1" placeholder="Hz3"></td>
-                            <td><input type="number" step="any" id="vKanan_s1" placeholder="V3"></td>
+                            <td><input type="text" id="t2_s1" placeholder="t2"></td><td>P.Ki</td>
+                            <td><input type="number" step="any" id="h2_s1" placeholder="Hz2"></td>
+                            <td><input type="number" step="any" id="v2_s1" placeholder="V2"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="t3_s1" placeholder="t3"></td><td>P.Ka</td>
+                            <td><input type="number" step="any" id="h3_s1" placeholder="Hz3"></td>
+                            <td><input type="number" step="any" id="v3_s1" placeholder="V3"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="t4_s1" placeholder="t4"></td><td>P.Ka</td>
+                            <td><input type="number" step="any" id="h4_s1" placeholder="Hz4"></td>
+                            <td><input type="number" step="any" id="v4_s1" placeholder="V4"></td>
                         </tr>
                     </table>
                 </div>
@@ -54,19 +62,27 @@
                 <div class="table-responsive">
                     <table class="table table-bordered mb-0 table-input">
                         <tr class="table-header">
-                            <td>Waktu</td><td>P.Ki/Ka</td><td>Mengufuk (ddd.mmss)</td><td>Pugak (ddd.mmss)</td>
+                            <td>Waktu</td><td>P.Ki/Ka</td><td>Mengufuk (Hz)</td><td>Pugak (V)</td>
                         </tr>
                         <tr>
-                            <td><input type="text" id="w1_s2" placeholder="9.05"></td>
-                            <td>P.Ki</td>
-                            <td><input type="number" step="any" id="hKiri_s2" placeholder="Hz1"></td>
-                            <td><input type="number" step="any" id="vKiri_s2" placeholder="V1"></td>
+                            <td><input type="text" id="t1_s2" placeholder="t1"></td><td>P.Ki</td>
+                            <td><input type="number" step="any" id="h1_s2" placeholder="Hz1"></td>
+                            <td><input type="number" step="any" id="v1_s2" placeholder="V1"></td>
                         </tr>
                         <tr>
-                            <td><input type="text" id="w3_s2" placeholder="9.07"></td>
-                            <td>P.Ka</td>
-                            <td><input type="number" step="any" id="hKanan_s2" placeholder="Hz3"></td>
-                            <td><input type="number" step="any" id="vKanan_s2" placeholder="V3"></td>
+                            <td><input type="text" id="t2_s2" placeholder="t2"></td><td>P.Ki</td>
+                            <td><input type="number" step="any" id="h2_s2" placeholder="Hz2"></td>
+                            <td><input type="number" step="any" id="v2_s2" placeholder="V2"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="t3_s2" placeholder="t3"></td><td>P.Ka</td>
+                            <td><input type="number" step="any" id="h3_s2" placeholder="Hz3"></td>
+                            <td><input type="number" step="any" id="v3_s2" placeholder="V3"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="t4_s2" placeholder="t4"></td><td>P.Ka</td>
+                            <td><input type="number" step="any" id="h4_s2" placeholder="Hz4"></td>
+                            <td><input type="number" step="any" id="v4_s2" placeholder="V4"></td>
                         </tr>
                     </table>
                 </div>
@@ -79,39 +95,39 @@
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="fw-bold">G. Lintang Stesen (φ)</label>
-                    <input type="number" id="latitud" class="form-control" step="any" placeholder="4.3520">
+                    <input type="number" id="latitud" class="form-control" placeholder="4.3520">
                 </div>
                 <div class="col-md-4">
                     <label class="fw-bold">Sudutistiwa (δ) Set 1</label>
-                    <input type="number" id="delta_s1" class="form-control" step="any" placeholder="2.1359">
+                    <input type="number" id="delta_s1" class="form-control" placeholder="2.1359">
                 </div>
                 <div class="col-md-4">
                     <label class="fw-bold">Sudutistiwa (δ) Set 2</label>
-                    <input type="number" id="delta_s2" class="form-control" step="any" placeholder="2.1402">
+                    <input type="number" id="delta_s2" class="form-control" placeholder="2.1402">
                 </div>
             </div>
-            <button class="btn btn-dark w-100 mt-3 py-2 fw-bold" onclick="kiraSemua()">PROSES KESELURUHAN DATA</button>
+            <button class="btn btn-dark w-100 mt-3 py-2 fw-bold" onclick="kiraSemua()">KIRA SEMUA JADUAL</button>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-6">
             <div class="card">
-                <div class="card-header">KIRAAN SET 1</div>
-                <div class="card-body small">
-                    Purata Altitud (H): <span id="resH_s1" class="result-val">-</span><br>
-                    Altitud Dilaras (α): <span id="resAlpha_s1" class="result-val">-</span><br>
-                    <strong>Azimut Set 1: <span id="resAz_s1" class="result-val">-</span></strong>
+                <div class="card-header">HASIL KIRAAN SET 1</div>
+                <div class="card-body">
+                    Purata Ufuk (B): <span id="resB_s1" class="result-val">-</span><br>
+                    Purata Altitud (D): <span id="resD_s1" class="result-val">-</span><br>
+                    <strong>Azimut Matahari: <span id="resAz_s1" class="result-val">-</span></strong>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
             <div class="card">
-                <div class="card-header">KIRAAN SET 2</div>
-                <div class="card-body small">
-                    Purata Altitud (H): <span id="resH_s2" class="result-val">-</span><br>
-                    Altitud Dilaras (α): <span id="resAlpha_s2" class="result-val">-</span><br>
-                    <strong>Azimut Set 2: <span id="resAz_s2" class="result-val">-</span></strong>
+                <div class="card-header">HASIL KIRAAN SET 2</div>
+                <div class="card-body">
+                    Purata Ufuk (B): <span id="resB_s2" class="result-val">-</span><br>
+                    Purata Altitud (D): <span id="resD_s2" class="result-val">-</span><br>
+                    <strong>Azimut Matahari: <span id="resAz_s2" class="result-val">-</span></strong>
                 </div>
             </div>
         </div>
@@ -119,22 +135,14 @@
 
     <div class="card summary-card">
         <div class="card-body text-center">
-            <h5 class="fw-bold text-uppercase">Perbandingan & Purata Akhir</h5>
-            <div class="row">
-                <div class="col-md-6">
-                    <p>Beza Azimut (Set 1 - Set 2): <span id="diffAz" class="fw-bold text-danger">-</span></p>
-                </div>
-                <div class="col-md-6">
-                    <h4 class="mb-0">PURATA AZIMUT GRID:</h4>
-                    <div id="finalAverage" class="display-6 fw-bold text-primary">00° 00' 00"</div>
-                </div>
-            </div>
+            <h5 class="fw-bold">RUMUSAN PERBANDINGAN</h5>
+            <p class="mb-1">Beza Antara Set: <span id="diffAz" class="fw-bold text-danger">-</span></p>
+            <h4 class="mb-0 text-primary">PURATA AZIMUT GRID: <span id="finalAverage">00° 00' 00"</span></h4>
         </div>
     </div>
 </div>
 
 <script>
-    // HELPER FUNCTIONS (KEKAL ASAL)
     function dmsToDd(val) {
         if (!val) return 0;
         let d = Math.floor(val);
@@ -153,33 +161,42 @@
         return d + "° " + m + "' " + s + "\"";
     }
 
-    // FUNGSI PENGIRAAN SETIAP SET
     function hitungSet(prefix, lat, delta) {
-        let Hz1 = dmsToDd(parseFloat(document.getElementById('hKiri_'+prefix).value));
-        let Hz3 = dmsToDd(parseFloat(document.getElementById('hKanan_'+prefix).value));
-        let V1 = dmsToDd(parseFloat(document.getElementById('vKiri_'+prefix).value));
-        let V3 = dmsToDd(parseFloat(document.getElementById('vKanan_'+prefix).value));
+        // Ambil semua 4 bacaan Hz dan V
+        let h1 = dmsToDd(parseFloat(document.getElementById('h1_'+prefix).value));
+        let h2 = dmsToDd(parseFloat(document.getElementById('h2_'+prefix).value));
+        let h3 = dmsToDd(parseFloat(document.getElementById('h3_'+prefix).value));
+        let h4 = dmsToDd(parseFloat(document.getElementById('h4_'+prefix).value));
 
-        // Purata Altitud (H) - Logik AM
-        let H_DD = ((90 - V1) + (V3 - 270)) / 2; 
+        let v1 = dmsToDd(parseFloat(document.getElementById('v1_'+prefix).value));
+        let v2 = dmsToDd(parseFloat(document.getElementById('v2_'+prefix).value));
+        let v3 = dmsToDd(parseFloat(document.getElementById('v3_'+prefix).value));
+        let v4 = dmsToDd(parseFloat(document.getElementById('v4_'+prefix).value));
 
-        // Biasan & Bedalihat
-        let H_rad = H_DD * Math.PI / 180;
-        let E_DD = ((41.4105 + (8.8 * Math.cos(H_rad))) / Math.tan(H_rad)) / 3600;
+        // Purata Ufuk (B) - Formula: (Hz1 + Hz2 + (Hz3-180) + (Hz4-180)) / 4
+        let purataHz = (h1 + h2 + (h3 - 180) + (h4 - 180)) / 4;
+        if (purataHz < 0) purataHz += 360;
+
+        // Purata Altitud (D) - Formula AM: ((90-V1)+(90-V2)+(V3-270)+(V4-270))/4
+        let h_alt = ((90-v1) + (90-v2) + (v3-270) + (v4-270)) / 4;
+
+        // Biasan & Bedalihat (E)
+        let h_rad = h_alt * Math.PI / 180;
+        let e_dd = ((41.4105 + (8.8 * Math.cos(h_rad))) / Math.tan(h_rad)) / 3600;
 
         // Altitud Dilaras (Alpha)
-        let alpha = H_DD - E_DD;
+        let alpha = h_alt - e_dd;
 
-        // Azimut Formula (Cosine Rule)
-        let alpha_rad = alpha * Math.PI / 180;
-        let phi_rad = lat * Math.PI / 180;
-        let delta_rad = delta * Math.PI / 180;
+        // Kira Azimut (Formula Kosain)
+        let a_rad = alpha * Math.PI / 180;
+        let p_rad = lat * Math.PI / 180;
+        let d_rad = delta * Math.PI / 180;
 
-        let cosA = (Math.sin(delta_rad) - (Math.sin(phi_rad) * Math.sin(alpha_rad))) / (Math.cos(phi_rad) * Math.cos(alpha_rad));
+        let cosA = (Math.sin(d_rad) - (Math.sin(p_rad) * Math.sin(a_rad))) / (Math.cos(p_rad) * Math.cos(a_rad));
         cosA = Math.max(-1, Math.min(1, cosA));
-        let az_DD = Math.acos(cosA) * 180 / Math.PI;
+        let az_dd = Math.acos(cosA) * 180 / Math.PI;
 
-        return { h: H_DD, a: alpha, az: az_DD };
+        return { b: purataHz, d: h_alt, az: az_dd };
     }
 
     function kiraSemua() {
@@ -188,29 +205,26 @@
             let d1 = dmsToDd(parseFloat(document.getElementById('delta_s1').value));
             let d2 = dmsToDd(parseFloat(document.getElementById('delta_s2').value));
 
-            // KIRA SET 1
             let s1 = hitungSet('s1', lat, d1);
-            document.getElementById('resH_s1').innerText = ddToDmsStr(s1.h);
-            document.getElementById('resAlpha_s1').innerText = ddToDmsStr(s1.a);
+            let s2 = hitungSet('s2', lat, d2);
+
+            // Papar Set 1
+            document.getElementById('resB_s1').innerText = ddToDmsStr(s1.b);
+            document.getElementById('resD_s1').innerText = ddToDmsStr(s1.d);
             document.getElementById('resAz_s1').innerText = ddToDmsStr(s1.az);
 
-            // KIRA SET 2
-            let s2 = hitungSet('s2', lat, d2);
-            document.getElementById('resH_s2').innerText = ddToDmsStr(s2.h);
-            document.getElementById('resAlpha_s2').innerText = ddToDmsStr(s2.a);
+            // Papar Set 2
+            document.getElementById('resB_s2').innerText = ddToDmsStr(s2.b);
+            document.getElementById('resD_s2').innerText = ddToDmsStr(s2.d);
             document.getElementById('resAz_s2').innerText = ddToDmsStr(s2.az);
 
-            // PERBANDINGAN & PURATA AKHIR
-            let diff = Math.abs(s1.az - s2.az) * 3600; // Dalam saat
-            let purataAz = (s1.az + s2.az) / 2;
-
+            // Perbandingan
+            let diff = Math.abs(s1.az - s2.az) * 3600;
             document.getElementById('diffAz').innerText = Math.round(diff) + " saat";
-            document.getElementById('finalAverage').innerText = ddToDmsStr(purataAz);
+            document.getElementById('finalAverage').innerText = ddToDmsStr((s1.az + s2.az) / 2);
 
-            if(diff > 30) alert("Amaran: Beza Azimut melebihi 30 saat!");
-
-        } catch (e) {
-            alert("Sila isi semua data cerapan!");
+        } catch (err) {
+            alert("Sila pastikan semua kotak data diisi dengan nombor yang betul!");
         }
     }
 </script>
