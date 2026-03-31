@@ -219,9 +219,10 @@
         
         let ptr = dmsToDd(parseFloat(document.getElementById('ptr_'+prefix).value) || 0);
 
-        // Purata Ufuk ke Matahari
-        let purataHz = (h1 + h2 + (h3 - 180) + (h4 - 180)) / 4;
-        if (purataHz < 0) purataHz += 360;
+        // Purata Ufuk ke Matahari (Ditambah +180 seperti yang diminta)
+        let purataHz = ((h1 + h2 + (h3 - 180) + (h4 - 180)) / 4) + 180;
+        while (purataHz < 0) purataHz += 360;
+        while (purataHz >= 360) purataHz -= 360;
 
         // Purata Altitud (D)
         let h_alt = ((90-v1) + (90-v2) + (v3-270) + (v4-270)) / 4;
