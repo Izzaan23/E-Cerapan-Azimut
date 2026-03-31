@@ -1,18 +1,94 @@
-<script>
-    // 1. Auto Tarikh & Waktu
-    document.getElementById('waktuSemasa').value = new Date().toLocaleString('ms-MY');
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Cerapan Azimut (Lampiran K1)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f7f6; padding-top: 20px; padding-bottom: 40px; }
+        .card { margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .card-header { font-weight: bold; background-color: #0d6efd; color: white; }
+        .section-title { font-size: 1.2rem; margin-bottom: 15px; border-bottom: 2px solid #0d6efd; padding-bottom: 5px; }
+        .result-box { font-size: 1.5rem; font-weight: bold; color: #0d6efd; }
+    </style>
+</head>
+<body>
 
-    // 2. Helper: Tukar D.MMSS ke Decimal Degree (PENTING untuk pengiraan)
-    function dmsToDd(dms) {
-        if (isNaN(dms)) return 0;
-        let d = Math.floor(dms);
-        let m = Math.floor((dms - d) * 100);
-        let s = Math.round((dms - d - (m / 100)) * 10000);
+<div class="container">
+    <h2 class="text-center mb-4">Sistem E-Cerapan Azimut</h2>
+
+    <div class="card">
+        <div class="card-header">Seksyen 1: Maklumat Am</div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6"><label>Stesen</label><input type="text" class="form-control" id="stn"></div>
+                <div class="col-md-6">
+                    <label>Latitud (φ) [D.MMSS]</label>
+                    <input type="number" id="latitud" class="form-control" step="any" placeholder="Contoh: 4.3520">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Seksyen 2: Data Cerapan (Format: D.MMSS)</div>
+        <div class="card-body">
+            <h5 class="section-title">Mengufuk (Hz)</h5>
+            <div class="row g-3 mb-3">
+                <div class="col-6"><label>P. Kiri (Hz1)</label><input type="number" id="hKiri" class="form-control" step="any"></div>
+                <div class="col-6"><label>P. Kanan (Hz3)</label><input type="number" id="hKanan" class="form-control" step="any"></div>
+            </div>
+            <h5 class="section-title">Pugak (V)</h5>
+            <div class="row g-3">
+                <div class="col-6"><label>P. Kiri (V1)</label><input type="number" id="vKiri" class="form-control" step="any"></div>
+                <div class="col-6"><label>P. Kanan (V3)</label><input type="number" id="vKanan" class="form-control" step="any"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Seksyen 3: Data Almanak</div>
+        <div class="card-body">
+            <label>Sudutistiwa (δ) [D.MMSS]</label>
+            <input type="number" id="sudutistiwa" class="form-control" step="any" placeholder="Contoh: 2.1359">
+            <button class="btn btn-success w-100 mt-4 py-2" onclick="kiraSemua()">KIRA AZIMUT</button>
+        </div>
+    </div>
+
+    <div class="card border-primary">
+        <div class="card-header bg-primary text-white">Seksyen 4: Keputusan (Calculation)</div>
+        <div class="card-body">
+            <div class="row text-center">
+                <div class="col-md-4">
+                    <p>Purata Altitud (H)</p>
+                    <div id="outH" class="fw-bold">-</div>
+                </div>
+                <div class="col-md-4">
+                    <p>Altitud Dilaras (α)</p>
+                    <div id="outAlpha" class="fw-bold">-</div>
+                </div>
+                <div class="col-md-4">
+                    <p>Azimut Matahari</p>
+                    <div id="finalAzimut" class="result-box">00° 00' 00"</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // FUNGSI TUKAR DMS KE DD
+    function dmsToDd(val) {
+        if (!val) return 0;
+        let d = Math.floor(val);
+        let m = Math.floor((val - d) * 100);
+        let s = (val - d - (m / 100)) * 10000;
         return d + (m / 60) + (s / 3600);
     }
 
-    // 3. Helper: Tukar Decimal Degree ke format D° M' S" (Paparan)
-    function ddToDmsString(dd) {
+    // FUNGSI TUKAR DD KE DMS STRING
+    function ddToDmsStr(dd) {
         let d = Math.floor(dd);
         let m = Math.floor((dd - d) * 60);
         let s = Math.round((dd - d - (m / 60)) * 3600);
@@ -21,76 +97,52 @@
         return d + "° " + m + "' " + s + "\"";
     }
 
-    // 4. THE BRAIN: Fungsi Kira Ikut Gambar Formula
     function kiraSemua() {
-        // Ambil Data dari Input (Pastikan ID input di HTML kau betul)
-        // Kita anggap Hz1, Hz2 (P.Ki) dan Hz3, Hz4 (P.Ka)
-        let Hz1 = dmsToDd(parseFloat(document.getElementById('hKiri').value)); 
-        let Hz3 = dmsToDd(parseFloat(document.getElementById('hKanan').value));
-        
-        // Data Pugak (V1-V4)
-        let V1 = dmsToDd(parseFloat(document.getElementById('vKiri').value));
-        let V3 = dmsToDd(parseFloat(document.getElementById('vKanan').value));
+        try {
+            // AMBIL DATA
+            let Hz1 = dmsToDd(parseFloat(document.getElementById('hKiri').value));
+            let Hz3 = dmsToDd(parseFloat(document.getElementById('hKanan').value));
+            let V1 = dmsToDd(parseFloat(document.getElementById('vKiri').value));
+            let V3 = dmsToDd(parseFloat(document.getElementById('vKanan').value));
+            let phi = dmsToDd(parseFloat(document.getElementById('latitud').value));
+            let delta = dmsToDd(parseFloat(document.getElementById('sudutistiwa').value));
 
-        // A. PURATA WAKTU - 8.00
-        // (Nota: Untuk demo, kita fokus pada formula B-F dahulu)
+            // B. PURATA UFUK (LOGIK Hz1 < 180 atau > 180)
+            let purataHz = (Hz1 < 180) ? (Hz1 + (Hz3 - 180)) / 2 : (Hz1 + (Hz3 + 180)) / 2;
 
-        // B. PURATA UFUK
-        let purataUfuk;
-        if (Hz1 < 180) {
-            // Formula: Hz1 + Hz2 + (Hz3-180) + (Hz4-180) / 4
-            // (Dipendekkan untuk 2 cerapan: (Hz1 + (Hz3-180)) / 2 )
-            purataUfuk = (Hz1 + (Hz3 - 180)) / 2;
-        } else {
-            // Formula: Hz1 + Hz2 + (Hz3+180) + (Hz4+180) / 4
-            purataUfuk = (Hz1 + (Hz3 + 180)) / 2;
-        }
+            // D. PURATA ALTITUD (H) - Auto Detect AM/PM
+            let jam = new Date().getHours();
+            let H_DD = (jam < 12) ? ((90 - V1) + (V3 - 270)) / 2 : (V1 + (V3 - 180)) / 2;
 
-        // D. PURATA ALTITUD (H)
-        let H_DD;
-        let jamSekarang = new Date().getHours();
-        
-        if (jamSekarang < 12) {
-            // Observation in AM: (90-V1) + (V3-270) / 2
-            H_DD = ((90 - V1) + (V3 - 270)) / 2;
-        } else {
-            // Observation in PM: (V1) + (V3-180) / 2
-            H_DD = (V1 + (V3 - 180)) / 2;
-        }
+            // E. BIASAN & BEDALIHAT
+            let H_rad = H_DD * Math.PI / 180;
+            let biasanSaat = (41.4105 + (8.8 * Math.cos(H_rad))) / Math.tan(H_rad);
+            let E_DD = biasanSaat / 3600;
 
-        // E. BIASAN & BEDALIHAT (PARALLAX)
-        // Formula: ((41.4105 + (8.8 cos H)) / tan H) / 3600 (Bahagi 3600 untuk jadi Degree)
-        let H_rad = H_DD * Math.PI / 180;
-        let biasanSaat = (41.4105 + (8.8 * Math.cos(H_rad))) / Math.tan(H_rad);
-        let E_DD = biasanSaat / 3600;
+            // F. ALTITUD DILARAS
+            let alpha = H_DD - E_DD;
 
-        // F. ALTITUD DILARAS (alpha)
-        let alpha = H_DD - E_DD;
+            // KIRA AZIMUT (FORMULA KOSAIN)
+            let alpha_rad = alpha * Math.PI / 180;
+            let phi_rad = phi * Math.PI / 180;
+            let delta_rad = delta * Math.PI / 180;
 
-        // --- PAPARKAN KEPUTUSAN ---
-        document.getElementById('purataH').value = ddToDmsString(H_DD);
-        document.getElementById('pembetulan').value = biasanSaat.toFixed(2) + " saat";
-        
-        // Pengiraan Azimut (Guna formula Kosain dari mesej sebelum ni)
-        let phi = dmsToDd(parseFloat(document.getElementById('latitud').value || 0));
-        let delta = dmsToDd(parseFloat(document.getElementById('sudutistiwa').value || 0));
-        
-        let cosA = (Math.sin(delta * Math.PI/180) - (Math.sin(phi * Math.PI/180) * Math.sin(alpha * Math.PI/180))) / 
-                   (Math.cos(phi * Math.PI/180) * Math.cos(alpha * Math.PI/180));
-        
-        let Azimut = Math.acos(cosA) * 180 / Math.PI;
+            let atas = Math.sin(delta_rad) - (Math.sin(phi_rad) * Math.sin(alpha_rad));
+            let bawah = Math.cos(phi_rad) * Math.cos(alpha_rad);
+            let cosA = atas / bawah;
+            
+            let azimut_DD = Math.acos(cosA) * 180 / Math.PI;
 
-        document.getElementById('finalBearing').innerText = ddToDmsString(Azimut);
-        
-        alert("Pengiraan Automatik Berjaya (Ikut Formula Lampiran K1)!");
-    }
+            // PAPAR KEPUTUSAN
+            document.getElementById('outH').innerText = ddToDmsStr(H_DD);
+            document.getElementById('outAlpha').innerText = ddToDmsStr(alpha);
+            document.getElementById('finalAzimut').innerText = ddToDmsStr(azimut_DD);
 
-    // Fungsi GPS (Kekal sama)
-    function getGPS() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                document.getElementById('koordinat').value = position.coords.latitude.toFixed(5) + ", " + position.coords.longitude.toFixed(5);
-            });
+        } catch (err) {
+            alert("Sila pastikan semua kotak diisi dengan nombor!");
         }
     }
 </script>
+
+</body>
+</html>
