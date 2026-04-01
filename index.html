@@ -199,15 +199,14 @@
         return isNegative ? -dd : dd;
     }
 
-    // FUNGSI BARU: Paparan format darjah minit saat yang lebih kemas
+    // FUNGSI BARU: Mengelakkan lari 1 saat akibat perpuluhan berterusan (floating point issue)
     function ddToDmsStr(dd) {
         if (isNaN(dd)) return "-";
         let absDd = Math.abs(dd);
-        let d = Math.floor(absDd);
-        let m = Math.floor((absDd - d) * 60);
-        let s = Math.round((absDd - d - (m / 60)) * 3600);
-        if (s >= 60) { s = 0; m++; }
-        if (m >= 60) { m = 0; d++; }
+        let totalSeconds = Math.round(absDd * 3600);
+        let d = Math.floor(totalSeconds / 3600);
+        let m = Math.floor((totalSeconds % 3600) / 60);
+        let s = totalSeconds % 60;
         return (dd < 0 ? "-" : "") + d + "° " + String(m).padStart(2, '0') + "' " + String(s).padStart(2, '0') + "\"";
     }
 
@@ -223,32 +222,37 @@
         let v4 = dmsToDd(parseFloat(document.getElementById('v4_'+prefix).value) || 0);
         
         let ptr = dmsToDd(parseFloat(document.getElementById('ptr_'+prefix).value) || 0);
-        
-        // Baca waktu pertama untuk tentukan pagi atau petang (Automatik)
         let waktu = parseFloat(document.getElementById('t1_'+prefix).value) || 0;
 
-        // FUNGSI BARU: Purata Ufuk menggunakan Vektor (Menyelesaikan isu +180 atau lari kuadran)
-        let rad = Math.PI / 180;
+        // --- 1. PURATA UFUK (Guna Kaedah Aritmetik manual, elak Math.atan2 yg boleh shift saat) ---
         let h3_adj = h3 >= 180 ? h3 - 180 : h3 + 180;
         let h4_adj = h4 >= 180 ? h4 - 180 : h4 + 180;
         
-        let sumSin = Math.sin(h1*rad) + Math.sin(h2*rad) + Math.sin(h3_adj*rad) + Math.sin(h4_adj*rad);
-        let sumCos = Math.cos(h1*rad) + Math.cos(h2*rad) + Math.cos(h3_adj*rad) + Math.cos(h4_adj*rad);
-        
-        let purataHz = Math.atan2(sumSin, sumCos) / rad;
-        if (purataHz < 0) purataHz += 360;
+        let h_arr = [h1, h2, h3_adj, h4_adj];
+        let sum_h = h_arr[0];
+        for (let i = 1; i < 4; i++) {
+            let diff = h_arr[i] - h_arr[0];
+            while (diff > 180) diff -= 360;
+            while (diff < -180) diff += 360;
+            sum_h += (h_arr[0] + diff);
+        }
+        let purataHz = sum_h / 4;
+        while (purataHz < 0) purataHz += 360;
+        while (purataHz >= 360) purataHz -= 360;
 
-        // Purata Altitud (D) (Anggapan input adalah sudut Zenit)
-        let h_alt = ((90-v1) + (90-v2) + (v3-270) + (v4-270)) / 4;
+        // --- 2. PURATA ALTITUD (D) ---
+        let h_alt = ((90 - v1) + (90 - v2) + (v3 - 270) + (v4 - 270)) / 4;
 
-        // Biasan & Bedalihat (E)
+        // --- 3. PEMBETULAN BIASAN & BEDALIHAT (Refraction & Parallax) ---
+        // Formula sebenar JUPEM: 58" cot(h) - 8.8" cos(h)
         let h_rad_alt = h_alt * Math.PI / 180;
-        let e_dd = ((41.4105 + (8.8 * Math.cos(h_rad_alt))) / Math.tan(h_rad_alt)) / 3600;
+        let refraction = (58 * (1 / Math.tan(h_rad_alt))) / 3600; // Pembetulan Biasan
+        let parallax = (8.8 * Math.cos(h_rad_alt)) / 3600; // Pembetulan Bedalihat
 
-        // Altitud Dilaras (Alpha)
-        let alpha = h_alt - e_dd;
+        // Altitud Dilaras (Alpha) = Apparent - Refraction + Parallax
+        let alpha = h_alt - refraction + parallax;
 
-        // Kira Azimut (Formula Kosain)
+        // --- 4. AZIMUT MATAHARI (Formula Kosain) ---
         let a_rad = alpha * Math.PI / 180;
         let p_rad = lat * Math.PI / 180;
         let d_rad = delta * Math.PI / 180;
@@ -257,12 +261,12 @@
         cosA = Math.max(-1, Math.min(1, cosA));
         let az_dd = Math.acos(cosA) * 180 / Math.PI;
 
-        // SEMAKAN WAKTU: Jika cerapan dibuat waktu petang (Waktu > 12.00), Azimut mesti 360 - Az
+        // SEMAKAN WAKTU: Jika cerapan petang (Waktu > 12.00), Az = 360 - Az
         if (waktu >= 12.00) {
             az_dd = 360 - az_dd;
         }
 
-        // --- FORMULA BEARING GRID ---
+        // --- 5. BEARING GRID KE T.R ---
         let bearingGrid = ptr + az_dd - purataHz + tirusanDd;
         while (bearingGrid < 0) bearingGrid += 360;
         while (bearingGrid >= 360) bearingGrid -= 360;
@@ -292,9 +296,9 @@
             document.getElementById('resAz_s2').innerText = ddToDmsStr(s2.az);
             document.getElementById('resGrid_s2').innerText = ddToDmsStr(s2.grid);
 
-            // Pengiraan beza bearing selamat untuk mengelak ralat rentas 360°
+            // Pengiraan beza bearing
             let diffDd = Math.abs(s1.grid - s2.grid);
-            if (diffDd > 180) diffDd = 360 - diffDd; // Contoh jika Set 1 = 359°, Set 2 = 1°
+            if (diffDd > 180) diffDd = 360 - diffDd; 
             document.getElementById('diffAz').innerText = ddToDmsStr(diffDd);
             
             // Pengiraan purata Bearing Grid akhir
