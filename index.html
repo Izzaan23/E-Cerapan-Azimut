@@ -185,6 +185,11 @@
 </div>
 
 <script>
+    // FUNGSI BARU: Bulatkan nilai darjah perpuluhan ke saat terdekat (Tiru sifat kiraan manual Borang K1)
+    function roundToSecond(dd) {
+        return Math.round(dd * 3600) / 3600;
+    }
+
     // FUNGSI BARU: Tukar nilai ddd.mmss kepada darjah perpuluhan (lebih stabil & tepat)
     function dmsToDd(val) {
         if (!val && val !== 0) return 0;
@@ -203,7 +208,8 @@
     function ddToDmsStr(dd) {
         if (isNaN(dd)) return "-";
         let absDd = Math.abs(dd);
-        let totalSeconds = Math.round(absDd * 3600);
+        // Tambah toFixed(6) untuk hapuskan "floating point artifact" sebelum round ke saat
+        let totalSeconds = Math.round(parseFloat((absDd * 3600).toFixed(6)));
         let d = Math.floor(totalSeconds / 3600);
         let m = Math.floor((totalSeconds % 3600) / 60);
         let s = totalSeconds % 60;
@@ -224,7 +230,7 @@
         let ptr = dmsToDd(parseFloat(document.getElementById('ptr_'+prefix).value) || 0);
         let waktu = parseFloat(document.getElementById('t1_'+prefix).value) || 0;
 
-        // --- 1. PURATA UFUK (Guna Kaedah Aritmetik manual, elak Math.atan2 yg boleh shift saat) ---
+        // --- 1. PURATA UFUK ---
         let h3_adj = h3 >= 180 ? h3 - 180 : h3 + 180;
         let h4_adj = h4 >= 180 ? h4 - 180 : h4 + 180;
         
@@ -239,18 +245,20 @@
         let purataHz = sum_h / 4;
         while (purataHz < 0) purataHz += 360;
         while (purataHz >= 360) purataHz -= 360;
+        purataHz = roundToSecond(purataHz); // [KEMASKINI]: Bundar ikut tulis manual
 
         // --- 2. PURATA ALTITUD (D) ---
         let h_alt = ((90 - v1) + (90 - v2) + (v3 - 270) + (v4 - 270)) / 4;
+        h_alt = roundToSecond(h_alt); // [KEMASKINI]: Bundar ikut tulis manual
 
         // --- 3. PEMBETULAN BIASAN & BEDALIHAT (Refraction & Parallax) ---
-        // Formula sebenar JUPEM: 58" cot(h) - 8.8" cos(h)
         let h_rad_alt = h_alt * Math.PI / 180;
-        let refraction = (58 * (1 / Math.tan(h_rad_alt))) / 3600; // Pembetulan Biasan
-        let parallax = (8.8 * Math.cos(h_rad_alt)) / 3600; // Pembetulan Bedalihat
+        let refraction = (58 * (1 / Math.tan(h_rad_alt))) / 3600; 
+        let parallax = (8.8 * Math.cos(h_rad_alt)) / 3600; 
 
         // Altitud Dilaras (Alpha) = Apparent - Refraction + Parallax
         let alpha = h_alt - refraction + parallax;
+        alpha = roundToSecond(alpha); // [KEMASKINI]: Bundar ikut tulis manual
 
         // --- 4. AZIMUT MATAHARI (Formula Kosain) ---
         let a_rad = alpha * Math.PI / 180;
@@ -261,15 +269,16 @@
         cosA = Math.max(-1, Math.min(1, cosA));
         let az_dd = Math.acos(cosA) * 180 / Math.PI;
 
-        // SEMAKAN WAKTU: Jika cerapan petang (Waktu > 12.00), Az = 360 - Az
         if (waktu >= 12.00) {
             az_dd = 360 - az_dd;
         }
+        az_dd = roundToSecond(az_dd); // [KEMASKINI]: Bundar ikut tulis manual
 
         // --- 5. BEARING GRID KE T.R ---
         let bearingGrid = ptr + az_dd - purataHz + tirusanDd;
         while (bearingGrid < 0) bearingGrid += 360;
         while (bearingGrid >= 360) bearingGrid -= 360;
+        bearingGrid = roundToSecond(bearingGrid); // [KEMASKINI]: Keputusan dipastikan dibundar dengan tepat
 
         return { b: purataHz, d: h_alt, az: az_dd, grid: bearingGrid };
     }
@@ -299,7 +308,7 @@
             // Pengiraan beza bearing
             let diffDd = Math.abs(s1.grid - s2.grid);
             if (diffDd > 180) diffDd = 360 - diffDd; 
-            document.getElementById('diffAz').innerText = ddToDmsStr(diffDd);
+            document.getElementById('diffAz').innerText = ddToDmsStr(roundToSecond(diffDd));
             
             // Pengiraan purata Bearing Grid akhir
             let finalAvg;
@@ -308,7 +317,7 @@
             } else {
                 finalAvg = (s1.grid + s2.grid) / 2;
             }
-            document.getElementById('finalAverage').innerText = ddToDmsStr(finalAvg);
+            document.getElementById('finalAverage').innerText = ddToDmsStr(roundToSecond(finalAvg));
 
         } catch (err) {
             console.error(err);
