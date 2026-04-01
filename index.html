@@ -153,6 +153,7 @@
             <div class="card">
                 <div class="card-header">HASIL KIRAAN SET 1</div>
                 <div class="card-body">
+                    Waktu UTC (Untuk Rujukan Almanak): <span id="resUTC_s1" class="result-val text-danger">-</span> jam<br>
                     Purata Ufuk (Matahari): <span id="resB_s1" class="result-val">-</span><br>
                     Purata Altitud (D): <span id="resD_s1" class="result-val">-</span><br>
                     Azimut Matahari (Az): <span id="resAz_s1" class="result-val">-</span><br>
@@ -165,6 +166,7 @@
             <div class="card">
                 <div class="card-header">HASIL KIRAAN SET 2</div>
                 <div class="card-body">
+                    Waktu UTC (Untuk Rujukan Almanak): <span id="resUTC_s2" class="result-val text-danger">-</span> jam<br>
                     Purata Ufuk (Matahari): <span id="resB_s2" class="result-val">-</span><br>
                     Purata Altitud (D): <span id="resD_s2" class="result-val">-</span><br>
                     Azimut Matahari (Az): <span id="resAz_s2" class="result-val">-</span><br>
@@ -185,16 +187,14 @@
 </div>
 
 <script>
-    // FUNGSI BARU: Bulatkan nilai darjah perpuluhan ke saat terdekat (Tiru sifat kiraan manual Borang K1)
     function roundToSecond(dd) {
         return Math.round(dd * 3600) / 3600;
     }
 
-    // FUNGSI BARU: Tukar nilai ddd.mmss kepada darjah perpuluhan (lebih stabil & tepat)
     function dmsToDd(val) {
         if (!val && val !== 0) return 0;
         let isNegative = val < 0;
-        let str = Math.abs(parseFloat(val)).toFixed(4); // Pastikan ada 4 titik perpuluhan
+        let str = Math.abs(parseFloat(val)).toFixed(4); 
         let parts = str.split('.');
         let d = parseInt(parts[0]);
         let ms = (parts[1] || '0000').padEnd(4, '0');
@@ -204,11 +204,9 @@
         return isNegative ? -dd : dd;
     }
 
-    // FUNGSI BARU: Mengelakkan lari 1 saat akibat perpuluhan berterusan (floating point issue)
     function ddToDmsStr(dd) {
         if (isNaN(dd)) return "-";
         let absDd = Math.abs(dd);
-        // Tambah toFixed(6) untuk hapuskan "floating point artifact" sebelum round ke saat
         let totalSeconds = Math.round(parseFloat((absDd * 3600).toFixed(6)));
         let d = Math.floor(totalSeconds / 3600);
         let m = Math.floor((totalSeconds % 3600) / 60);
@@ -228,7 +226,16 @@
         let v4 = dmsToDd(parseFloat(document.getElementById('v4_'+prefix).value) || 0);
         
         let ptr = dmsToDd(parseFloat(document.getElementById('ptr_'+prefix).value) || 0);
-        let waktu = parseFloat(document.getElementById('t1_'+prefix).value) || 0;
+        
+        // Pengiraan Waktu untuk Almanak Matahari
+        let t1_raw = parseFloat(document.getElementById('t1_'+prefix).value) || 0;
+        let t1_dd = dmsToDd(parseFloat(document.getElementById('t1_'+prefix).value) || 0);
+        let t2_dd = dmsToDd(parseFloat(document.getElementById('t2_'+prefix).value) || 0);
+        let t3_dd = dmsToDd(parseFloat(document.getElementById('t3_'+prefix).value) || 0);
+        let t4_dd = dmsToDd(parseFloat(document.getElementById('t4_'+prefix).value) || 0);
+        
+        let purataWaktuDd = (t1_dd + t2_dd + t3_dd + t4_dd) / 4;
+        let waktuUTC = purataWaktuDd - 8.00;
 
         // --- 1. PURATA UFUK ---
         let h3_adj = h3 >= 180 ? h3 - 180 : h3 + 180;
@@ -245,22 +252,30 @@
         let purataHz = sum_h / 4;
         while (purataHz < 0) purataHz += 360;
         while (purataHz >= 360) purataHz -= 360;
-        purataHz = roundToSecond(purataHz); // [KEMASKINI]: Bundar ikut tulis manual
+        purataHz = roundToSecond(purataHz); 
 
         // --- 2. PURATA ALTITUD (D) ---
-        let h_alt = ((90 - v1) + (90 - v2) + (v3 - 270) + (v4 - 270)) / 4;
-        h_alt = roundToSecond(h_alt); // [KEMASKINI]: Bundar ikut tulis manual
+        let h_alt;
+        if (t1_raw >= 12.00) {
+            // Formula Observation in PM mengikut borang K1
+            h_alt = (v1 + v2 + (v3 - 180) + (v4 - 180)) / 4;
+        } else {
+            // Formula Observation in AM mengikut borang K1
+            h_alt = ((90 - v1) + (90 - v2) + (v3 - 270) + (v4 - 270)) / 4;
+        }
+        h_alt = roundToSecond(h_alt);
 
         // --- 3. PEMBETULAN BIASAN & BEDALIHAT (Refraction & Parallax) ---
         let h_rad_alt = h_alt * Math.PI / 180;
-        let refraction = (58 * (1 / Math.tan(h_rad_alt))) / 3600; 
-        let parallax = (8.8 * Math.cos(h_rad_alt)) / 3600; 
+        // FORMULA KHAS PUO/K1: (41.4105 + 8.8 cos H) / Tan H
+        let correction_sec = (41.4105 + (8.8 * Math.cos(h_rad_alt))) / Math.tan(h_rad_alt); 
+        let correction_deg = correction_sec / 3600;
 
-        // Altitud Dilaras (Alpha) = Apparent - Refraction + Parallax
-        let alpha = h_alt - refraction + parallax;
-        alpha = roundToSecond(alpha); // [KEMASKINI]: Bundar ikut tulis manual
+        // Altitud Dilaras (Alpha)
+        let alpha = h_alt - correction_deg;
+        alpha = roundToSecond(alpha);
 
-        // --- 4. AZIMUT MATAHARI (Formula Kosain) ---
+        // --- 4. AZIMUT MATAHARI ---
         let a_rad = alpha * Math.PI / 180;
         let p_rad = lat * Math.PI / 180;
         let d_rad = delta * Math.PI / 180;
@@ -269,18 +284,18 @@
         cosA = Math.max(-1, Math.min(1, cosA));
         let az_dd = Math.acos(cosA) * 180 / Math.PI;
 
-        if (waktu >= 12.00) {
+        if (t1_raw >= 12.00) {
             az_dd = 360 - az_dd;
         }
-        az_dd = roundToSecond(az_dd); // [KEMASKINI]: Bundar ikut tulis manual
+        az_dd = roundToSecond(az_dd);
 
         // --- 5. BEARING GRID KE T.R ---
         let bearingGrid = ptr + az_dd - purataHz + tirusanDd;
         while (bearingGrid < 0) bearingGrid += 360;
         while (bearingGrid >= 360) bearingGrid -= 360;
-        bearingGrid = roundToSecond(bearingGrid); // [KEMASKINI]: Keputusan dipastikan dibundar dengan tepat
+        bearingGrid = roundToSecond(bearingGrid);
 
-        return { b: purataHz, d: h_alt, az: az_dd, grid: bearingGrid };
+        return { b: purataHz, d: h_alt, az: az_dd, grid: bearingGrid, utc: waktuUTC };
     }
 
     function kiraSemua() {
@@ -294,12 +309,14 @@
             let s2 = hitungSet('s2', lat, d2, tirusan);
 
             // Papar Set 1
+            document.getElementById('resUTC_s1').innerText = s1.utc.toFixed(2);
             document.getElementById('resB_s1').innerText = ddToDmsStr(s1.b);
             document.getElementById('resD_s1').innerText = ddToDmsStr(s1.d);
             document.getElementById('resAz_s1').innerText = ddToDmsStr(s1.az);
             document.getElementById('resGrid_s1').innerText = ddToDmsStr(s1.grid);
 
             // Papar Set 2
+            document.getElementById('resUTC_s2').innerText = s2.utc.toFixed(2);
             document.getElementById('resB_s2').innerText = ddToDmsStr(s2.b);
             document.getElementById('resD_s2').innerText = ddToDmsStr(s2.d);
             document.getElementById('resAz_s2').innerText = ddToDmsStr(s2.az);
